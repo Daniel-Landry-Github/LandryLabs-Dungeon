@@ -24,36 +24,86 @@ namespace DungeonGame
         public string Name = "NPC";
         public int Level = 1, HealthPoints = 1, AttackPoints = 5;
 
+        // Method to generate NPC stats to pair against the Player in the Battle method.
+        public static int ChangeNPC(int npcAttack) 
+        {
+            Random random = new Random();
+            npcAttack = random.Next(1, 8);
+            return npcAttack;
+        }
     }
 
     class Dungeon
     {
-        public bool victory = true;
-        // Method GenerateNPC to generate NPC stats to pair against the Player in the Battle method.
+        public static bool victory = true;
+
 
         // Method 'Battle' to perform the calculations against the Player and the randomly chosen NPC then return a victory or a loss.
-        public static bool Battle(int playerAttack, int npcAttack, bool victory)
+        public static void Battle(int playerAttack, int npcAttack)
         {
-            
-            Console.WriteLine($"Your AttackPoints: {playerAttack}\tNPC AttackPoints: {npcAttack}");
-            
-            if (playerAttack > npcAttack) 
+            bool activeDungeon = true;
+            var continueBattle = "Y";
+            Dungeon Dungeon1 = new Dungeon();
+            while (victory == true)
             {
-                victory = true;
-                Console.WriteLine("You won!");
-                Console.ReadLine();
+                if (continueBattle == "N")
+                {
+                    Console.WriteLine("Returning to Town...");
+                    Bridge.Town();
+                }
+                else if (continueBattle == "Y")
+                {
+                    npcAttack = NPC.ChangeNPC(npcAttack);
+                    Console.WriteLine($"Your AttackPoints: {playerAttack}\tNPC AttackPoints: {npcAttack}");
+
+                    if (playerAttack >= npcAttack)
+                    {
+                        victory = true;
+                        Console.WriteLine("You won!");
+                    }
+                    else
+                    {
+                        victory = false;
+                        Console.WriteLine("You lost!\nReturning to Town...");
+                        break;
+                    }
+                    Console.WriteLine("Continue? (Y/N)");
+                    continueBattle = Console.ReadLine();
+                }
             }
-            else
-            {
-                victory = false;
-                Console.WriteLine("You lost!");
-                Console.ReadLine();
-            }
-            return victory;
+            Bridge.Town();
         }
     }
 
-    public class Program
+    public class Bridge
+    {
+
+        public static void Town()
+        {
+            Console.WriteLine("Name your character: ");
+            string submittedName = Console.ReadLine();
+            Console.WriteLine("Initializing new player...");
+
+            Player Player1 = new Player();
+            NPC Npc1 = new NPC();
+
+            Console.WriteLine($"Name: {Player1.Name}\nLevel: {Player1.Level}\nHealthPoints: {Player1.HealthPoints}\nAttackPoints: {Player1.AttackPoints}\nExperience: {Player1.Experience}\n\n");
+
+            Console.WriteLine("Welcome to Town.");
+            Console.WriteLine("Battle? (Y/N)");
+            var startBattle = Console.ReadLine();
+
+            if (startBattle == "N")
+            {
+                Town();
+            }
+            else if (startBattle == "Y")
+            {
+                Dungeon.Battle(Player1.AttackPoints, Npc1.AttackPoints);
+            }
+        }
+    }
+    public static class Program
     {
         public static void Main()
         {
@@ -69,33 +119,11 @@ namespace DungeonGame
             {
                 Console.WriteLine("Starting...");
             }
-            Console.WriteLine("Enter a name: ");
-            string submittedName = Console.ReadLine();
-            Console.WriteLine("Initializing new player...");
 
-            Player Player1 = new Player();
-            NPC Npc1 = new NPC();
 
-            // Player1.Name = submittedName;
-            // Player1.Name = submittedName;
-            Console.WriteLine($"Name: {Player1.Name}\nLevel: {Player1.Level}\nHealthPoints: {Player1.HealthPoints}\nAttackPoints: {Player1.AttackPoints}\nExperience: {Player1.Experience}\n\n");
-            
-            Console.WriteLine("Battle? (Y/N)");
-            var startBattle = Console.ReadLine();
-            
-            if (startBattle == "N")
-            {
-                Main();
-            }
-            else if (startBattle == "Y")
-            {
-                Dungeon Dungeon1 = new Dungeon();
-                while (Dungeon1.victory == true)
-                {
-                    Dungeon.Battle(Player1.AttackPoints, Npc1.AttackPoints, Dungeon1.victory);
-                }
-            }
-            
+            Bridge.Town();
+
+
             Console.ReadLine();
         }
     }
